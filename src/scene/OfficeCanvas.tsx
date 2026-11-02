@@ -8,6 +8,8 @@ import { createMotion } from "../characters/motion";
 import { AGENTS } from "../config/agents";
 import { DIVISIONS } from "../config/divisions";
 import { Desk } from "./desk/Desk";
+import { DuelGround } from "./decor/DuelGround";
+import { DuelVfx } from "./DuelVfx";
 import { Lounge } from "./decor/Lounge";
 import { RoomsDecor } from "./decor/Rooms";
 import { RgbTicker } from "./desk/RgbTicker";
@@ -40,6 +42,7 @@ export function OfficeCanvas() {
         <RoomsDecor layout={layout} />
         {layout.lounge && <Lounge layout={layout} />}
         {layout.stairs && <StairTower layout={layout} />}
+        <DuelGround layout={layout} />
         <Roofs layout={layout} />
         <RgbTicker />
         {AGENTS.map((a, i) => <Desk key={a.id} x={layout.desks[i].x} y={layout.desks[i].y} z={layout.desks[i].z} agentId={a.id} style={a.desk} />)}
@@ -48,6 +51,7 @@ export function OfficeCanvas() {
         <SelectionRing />
         <Pulses layout={layout} />
         <Familiars layout={layout} motions={motions} />
+        <DuelVfx layout={layout} motions={motions} />
         <LoungeBehavior layout={layout} motions={motions} />
         <CameraRig layout={layout} />
         <TagProjector />

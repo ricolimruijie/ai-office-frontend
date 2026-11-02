@@ -32,13 +32,19 @@ export function LoungeBehavior({ layout, motions }: { layout: Layout; motions: R
     const pickSpot = (i: number, avoid = -1): number => {
       const free = layout.spots.map((_, k) => k).filter(k => !taken.current.has(k) && k !== avoid);
       if (!free.length) return -1;
+      // A wizard who arrives while a partner is already waiting at the other end of a ring gets paired up.
+      const waiting = free.filter(k => {
+        const partner = layout.spots[k].partner;
+        return partner !== undefined && taken.current.has(partner);
+      });
+      if (waiting.length && Math.random() < 0.65) return waiting[Math.floor(Math.random() * waiting.length)];
       // Everyone has their own taste, so start the search at a different place for each character.
       return free[(i * 3 + Math.floor(Math.random() * free.length)) % free.length];
     };
 
     function arrive(i: number, spot: ActivitySpot, k: number, mode: Mode) {
       const m = motions[i], mind = minds[i];
-      m.pose = "activity"; m.activity = spot.kind; m.heading = spot.heading; m.x = spot.x; m.z = spot.z; m.y = spot.y; m.speedMul = 1;
+      m.pose = "activity"; m.activity = spot.kind; m.heading = spot.heading; m.x = spot.x; m.z = spot.z; m.y = spot.y; m.speedMul = 1; m.spot = k;
       mind.mode = mode; mind.spot = k; mind.until = performance.now() + rand(22000, 45000);
     }
 
@@ -46,7 +52,7 @@ export function LoungeBehavior({ layout, motions }: { layout: Layout; motions: R
       const m = motions[i], mind = minds[i];
       if (mind.spot >= 0) taken.current.delete(mind.spot);
       mind.mode = "returning"; mind.spot = -1;
-      m.activity = null; m.speedMul = 1.35;
+      m.activity = null; m.speedMul = 1.35; m.spot = -1;
       m.path = routeFromSpot(layout, i, spot); m.pose = "walking";
       m.onArrive = () => {
         m.pose = "seated"; m.heading = 0; m.speedMul = 1;
@@ -67,7 +73,7 @@ export function LoungeBehavior({ layout, motions }: { layout: Layout; motions: R
         const from = mind.mode === "lounge" ? layout.spots[mind.spot] : null;
         if (mind.spot >= 0) taken.current.delete(mind.spot);
         mind.mode = "meetGoing"; mind.spot = -1;
-        m.carry = false; m.activity = null; m.speedMul = 1.15;
+        m.carry = false; m.activity = null; m.speedMul = 1.15; m.spot = -1;
         m.path = from ? routeSpotToSpot(layout, from, seat) : routeToSpot(layout, i, seat);
         if (INSTANT) { arrive(i, seat, -1, "meeting"); return; }
         m.pose = "walking";

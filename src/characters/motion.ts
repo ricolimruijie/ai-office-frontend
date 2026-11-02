@@ -17,12 +17,14 @@ export interface RobotMotion {
   onArrive: (() => void) | null;
   /** What the character is doing in the lounge while pose is "activity". */
   activity: ActivityKind | null;
+  /** Index into layout.spots of the spot the character occupies, or -1. */
+  spot: number;
   /** Multiplier on walking speed (a character hurrying back to work walks faster). */
   speedMul: number;
 }
 
 export const createMotion = (x: number, z: number, y = 0): RobotMotion => ({
-  pose: "seated", x, y, z, heading: 0, carry: false, casting: false, walkPhase: 0, path: [], onArrive: null, activity: null, speedMul: 1
+  pose: "seated", x, y, z, heading: 0, carry: false, casting: false, walkPhase: 0, path: [], onArrive: null, activity: null, spot: -1, speedMul: 1
 });
 
 /* Walk a character along its path. Points can carry a height, so a climb up the staircase is just more points.

@@ -43,7 +43,7 @@ The inbox paper and walk label are view state because they depend on animation t
 
 Anything that changes every frame stays out of React state:
 
-- `RobotMotion` (`src/characters/motion.ts`): position (including height), pose, heading, walking path, and the lounge activity of each character.
+- `RobotMotion` (`src/characters/motion.ts`): position (including height), pose, heading, walking path, the lounge activity of each character and the index of the activity spot it occupies (`spot`, `-1` when none).
 - `sceneState` (`src/scene/sceneState.ts`): router flash, tag anchors and elements, and every character's motion (so doors know who is near).
 - The clock (`src/state/clockStore.ts`) is read inside `useFrame`, so the sky and lamps change without re-rendering.
 
@@ -58,12 +58,13 @@ Characters read the store with `getState()` inside `useFrame`, so a status chang
 - **Rooms.** `layout.rooms` lists every building as a `RoomRect` with its doorway (`doorX`), the walking lane just inside (`laneZ`) and the lane just outside (`outZ`). All desks face +z, so every building opens to the south.
 - **The Headmaster's Tower.** The only upper-floor room (`level: 1`, `UPPER_Y` high). Its spiral staircase (`layout.stairs`) is a list of points that climb, so walking up is just a path with rising heights.
 - **Great Hall.** Sized so one table seats every agent. `layout.meeting` holds the table and one seat per agent, each an `ActivitySpot`.
+- **Duelling courtyard.** `layout.duel` is the raised ring in the west forecourt (`x`, `z`, `halfW`, `halfD`, `ringR`). Four `duel` spots stand in two pairs, each spot naming its `partner`, so the scene knows who faces whom.
 - **Routes.** `routeToSpot`, `routeFromSpot` and `routeSpotToSpot` build a path from the chair out of the room (down the stairs for a tower), along the lanes (through the nearest passage when the rows differ), and into the spot's room. Each spot's `via` list starts just inside its doorway.
 - `deliveryTime()` estimates how long a familiar delivery takes: the summoning spell, the flight (`familiarFlight`, a straight arc at `FAMILIAR_SPEED`) and the landing.
 
 The backend does not know about this geometry. The frontend plays the cast and the owl flight (about 4 to 10 s) whenever a `agent.handoff` event arrives, and the mock backend waits a random 4 to 10 s before starting the receiver.
 
-**Behavior away from the desk** (`src/characters/LoungeBehavior.tsx`): a throttled loop that watches each agent's status and the `meeting` flag. After an idle spell it sends the character to a free lounge spot, switches spots now and then, and sends it home when its status leaves idle. When a meeting is called every character goes to its seat (from the desk or from the lounge) and goes home when it ends. It never touches the event contract.
+**Behavior away from the desk** (`src/characters/LoungeBehavior.tsx`): a throttled loop that watches each agent's status and the `meeting` flag. After an idle spell it sends the character to a free activity spot, switches spots now and then, and sends it home when its status leaves idle. A wizard arriving while a partner already waits at the other end of a duelling ring joins that partner most of the time. When a meeting is called every character goes to its seat (from the desk or from the lounge) and goes home when it ends. It never touches the event contract.
 
 **Inside and outside view.** The store's `viewMode` is read each frame by `Cutaway` (walls stay full height outside, drop when seen from outside inside) and `Roofs` (roofs slide up and away inside, settle on outside). The name tags hide through a CSS class.
 
@@ -82,6 +83,8 @@ The look is cel-shaded: every material is a `MeshToonMaterial` with a 3-step gra
 | Gaming workstations (six styles) and RGB lighting | `desk/Desk.tsx`, `desk/gear.tsx`, `desk/rgb.ts` |
 | Room furniture, forecourt fountain, headmaster's study | `decor/Rooms.tsx`, `decor/props.tsx`, `decor/magic.tsx` |
 | Common room | `decor/Lounge.tsx` |
+| Duelling courtyard (platform, rune ring, torches, standards, dummies) | `decor/DuelGround.tsx` |
+| Spellfire between duelling partners | `DuelVfx.tsx` |
 | Great Hall table and chairs | `decor/Rooms.tsx` (`GreatHallDecor`) |
 | Roofs for the outside view | `Roofs.tsx` |
 | Characters: skeleton, face, hands, hair, outfits | `characters/Character.tsx`, `CharacterParts.tsx` |
@@ -91,7 +94,7 @@ The look is cel-shaded: every material is a `MeshToonMaterial` with a 3-step gra
 
 **Time of day.** `timeOfDay.ts` blends between hand-tuned moments (night, dawn, morning, noon, afternoon, golden hour, dusk) for sky, sun, sky light, and how much the windows and lamps glow. The sun crosses from east to west between 6:00 and 19:00. Shared materials for windows and lamps (`materials.ts`) are updated once per frame, so every window lights up together.
 
-**Characters.** `Character.tsx` builds one skeleton from groups (joints). Each frame `computePose()` returns the target angle for every joint and every face control from the character's status, pose and activity, and the joints ease toward it. Ghost and zombie differ only in body parts and a few pose tweaks (ghosts float, have a tail and fly when they travel, zombies walk with arms out). `Hand` animates five fingers with two joints each.
+**Characters.** `Character.tsx` builds one skeleton from groups (joints). Each frame `computePose()` returns the target angle for every joint and every face control from the character's status, pose and activity, and the joints ease toward it. A `robe` adds a skirt group under the hips whose height and width follow the hip height, so it clears the floor while seated; a `wizardhat` sits on the skull and the hair is skipped. Ghost and zombie differ only in body parts and a few pose tweaks (ghosts float, have a tail and fly when they travel, zombies walk with arms out). `Hand` animates five fingers with two joints each.
 
 **Cost.** The whole scene is roughly 4,000 draw calls, a third of them in the shadow pass, so small props do not cast shadows. Outlines and fingers are switched off when the camera is far, ceiling pieces fade, and the shadow map is smaller on phones.
 

@@ -167,6 +167,15 @@ export function computePose(c: PoseCtx, P: Pose): Pose {
       P.thLX = -0.28; P.thRX = 0.12; P.knLX = 0.3; P.knRX = 0.06;
       P.shLX = -1.35; P.elLX = -0.15; P.shLZ = 0.1; P.wrLX = 0.2; P.gripL = 0.2;
       P.shRX = -1.0 + stroke * 0.5; P.elRX = -1.0 - stroke * 0.3; P.shRZ = -0.25; P.gripR = 0.85; P.prop = "cue";
+    } else if (a === "duel") { // duelling stance: lunge, wand arm raised, a cast every few seconds
+      const jab = Math.max(0, Math.sin(t * 1.6 + c.seed * 0.7)) ** 2;
+      P.hipsY = z ? 0.92 : 1.0 + Math.sin(t * 1.6 + c.seed) * 0.03 * m;
+      P.spineX = 0.12; P.chestX = 0.04; P.spineZ = -0.07 + jab * 0.05; P.headX = -0.05;
+      P.thLX = -0.36; P.thRX = 0.3; P.knLX = 0.42; P.knRX = 0.12; P.thLZ = 0.05; P.thRZ = -0.06; P.anLX = P.anRX = 0.1;
+      if (!z) { P.tail1X = -0.5; P.tail2X = 0.3; P.tail3X = 0.4; P.tail1Z = P.tail2Z = P.tail3Z = 0; }
+      P.shRX = -1.62 + jab * 0.45; P.shRZ = -0.22; P.elRX = -0.55 + jab * 0.2; P.wrRX = 0.1 + jab * 0.3; P.gripR = 0.9; P.prop = "wand";
+      P.shLX = -0.9; P.elLX = -1.2; P.shLZ = 0.34; P.gripL = 0.7;
+      P.headZ = jab * 0.06;
     } else if (a === "meeting") { // seated at the table: hands on it, nodding, or talking with gestures
       P.spineX = 0.08; P.chestX = 0.03; P.shLZ = 0.12; P.shRZ = -0.12;
       P.shLX = -0.8; P.elLX = -0.85; P.wrLX = 0.15; P.gripL = 0.4;
@@ -216,6 +225,7 @@ export function computePose(c: PoseCtx, P: Pose): Pose {
     if (a === "ps5" || a === "arcade") { P.look = "point"; P.lookY = 0.1; P.lookX = Math.sin(t * 1.7) * 0.2; P.browAngry = 0.35; P.mouthCurve = 0.25 + laugh * 0.7; P.mouthOpen = 0.12 + laugh * 0.45; P.mouthW = 1.1; }
     if (a === "sim") { P.look = "point"; P.lookY = 0.05; P.lid = 0.3; P.browAngry = 0.6; P.browRaise = -0.1; P.mouthCurve = -0.05 + laugh * 0.6; P.mouthOpen = 0.14 + laugh * 0.4; P.mouthW = 0.9; }
     if (a === "pool") { P.look = "point"; P.lookY = -0.35; P.lid = 0.25; P.browAngry = 0.4; P.mouthCurve = 0.1; P.mouthW = 0.9; P.mouthOpen = laugh * 0.5; }
+    if (a === "duel") { P.look = "point"; P.lookX = 0.12; P.lookY = 0.12; P.lid = 0.22; P.browAngry = 0.55; P.browRaise = -0.1; P.mouthCurve = 0.2 + Math.max(0, Math.sin(t * 1.6 + c.seed * 0.7)) * 0.5; P.mouthW = 0.9; P.cheek = 0.5; }
     if (a === "bar") { P.mouthCurve = 0.7 + laugh * 0.3; P.mouthOpen = laugh * 0.5; P.mouthW = 1.25; }
     if (a === "meeting") {
       if (c.speaking) { P.mouthCurve = 0.3; P.mouthOpen = 0.1 + Math.abs(Math.sin(t * 9 + c.seed)) * 0.28; P.mouthW = 1.1; P.browRaise = 0.35; P.look = "camera"; }

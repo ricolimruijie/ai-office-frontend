@@ -1,7 +1,7 @@
 export type CharacterKind = "ghost" | "zombie";
 export type HairStyle = "none" | "messy" | "patchy" | "slick" | "spiky" | "bun" | "long";
-export type Outfit = "suit" | "hoodie" | "labcoat" | "vest" | "scarf" | "none";
-export type Accessory = "monocle" | "glasses" | "roundglasses" | "headphones" | "goggles" | "cap" | "beanie" | "tophat" | "none";
+export type Outfit = "suit" | "hoodie" | "labcoat" | "vest" | "scarf" | "robe" | "none";
+export type Accessory = "monocle" | "glasses" | "roundglasses" | "headphones" | "goggles" | "cap" | "beanie" | "tophat" | "wizardhat" | "none";
 export type Extra = "stitches" | "bandage" | "bone" | "bowtie" | "tie";
 export type DeskStyle = "executive" | "lab" | "writer" | "backend" | "frontend" | "qa";
 

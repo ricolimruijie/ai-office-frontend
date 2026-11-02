@@ -170,6 +170,27 @@ export function AccessoryMesh({ kind, accent, outfit }: { kind: Accessory; accen
         <Cylr rt={0.17} rb={0.18} h={0.28} pos={[0, 0.37, 0]} color="#1A1C22" />
         <Cylr rt={0.182} rb={0.182} h={0.05} pos={[0, 0.27, 0]} color="#C8423A" />
       </>);
+    case "wizardhat": {
+      // A bent, three-segment cone over a wide brim. The brim sits just above the brow so the eyes stay
+      // visible, and the tip stops at y = 0.578 above the skull centre, clear of the status gem (world y 2.32).
+      const felt = shade(outfit, 0.72);
+      return (
+        <group rotation={[-0.1, 0, 0.03]}>
+          <Cylr rt={0.31} rb={0.335} h={0.026} pos={[0, 0.235, 0]} color={felt} />
+          <group position={[0, 0.248, 0]}>
+            <Cylr rt={0.185} rb={0.26} h={0.13} pos={[0, 0.065, 0]} color={outfit} />
+            <Cylr rt={0.25} rb={0.256} h={0.05} pos={[0, 0.028, 0]} color={accent} outline={false} />
+            <Blk size={[0.058, 0.048, 0.02]} pos={[0, 0.028, 0.252]} color="#E3B341" />
+            <group position={[0, 0.13, 0]} rotation={[0.05, 0, 0.12]}>
+              <Cylr rt={0.085} rb={0.185} h={0.1} pos={[0, 0.05, 0]} color={outfit} />
+              <group position={[0, 0.1, 0]} rotation={[0.07, 0, 0.2]}>
+                <Cylr rt={0.005} rb={0.085} h={0.1} pos={[0, 0.05, 0]} color={shade(outfit, 0.85)} />
+              </group>
+            </group>
+          </group>
+        </group>
+      );
+    }
     default:
       return null;
   }
@@ -216,6 +237,17 @@ export function OutfitChest({ outfit, color, accent, ghost }: { outfit: Outfit; 
         <Sph r={0.14} pos={[0, 0.3, -0.12]} scale={[1.2, 0.8, 0.75]} color={color} />
         <Blk size={[0.24, 0.09, 0.04]} pos={[0, 0.0, r + 0.02]} color={shade(color, 0.82)} />
         {[-1, 1].map(s => <Cylr key={s} rt={0.007} h={0.12} pos={[s * 0.045, 0.22, r + 0.025]} color="#FFFFFF" outline={false} seg={6} />)}
+      </>);
+    case "robe":
+      return (<>
+        <Caps r={r + 0.02} len={0.15} pos={[0, 0.1, 0]} color={color} />
+        {/* The robe opens down the middle, with a lighter lining showing between the panels. */}
+        <Blk size={[0.06, 0.32, 0.02]} pos={[0, 0.08, r + 0.022]} color={shade(color, 0.55)} />
+        {[-1, 1].map(s => <Blk key={s} size={[0.05, 0.3, 0.028]} pos={[s * 0.062, 0.1, r + 0.026]} rot={[0, 0, s * 0.14]} color={shade(color, 1.35)} />)}
+        {/* Flared collar wings behind the neck; a full ring would be swallowed by the head sphere. */}
+        {[-1, 1].map(s => <Blk key={s} size={[0.028, 0.17, 0.14]} pos={[s * 0.125, 0.29, -0.08]} rot={[0.28, s * 0.55, s * 0.34]} color={shade(color, 1.4)} />)}
+        <Blk size={[0.075, 0.09, 0.02]} pos={[-0.085, 0.15, r + 0.034]} color="#E3B341" />
+        <Blk size={[0.04, 0.05, 0.022]} pos={[-0.085, 0.15, r + 0.038]} color={shade(color, 1.15)} />
       </>);
     default:
       return <Caps r={r} len={0.14} pos={[0, 0.1, 0]} color={accent} />;

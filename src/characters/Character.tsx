@@ -44,8 +44,8 @@ export function Character({ agent, motion }: Props) {
   const hairStyle = look.hair ?? "none", hairColor = look.hairColor ?? "#2B2B33";
   const outfit = look.outfit ?? "none", outfitColor = look.outfitColor ?? agent.color;
   const pants = look.pants ?? "#2F3547", accessory = look.accessory ?? "none", extras = look.extras ?? [];
-  const sleeve = outfit === "suit" || outfit === "hoodie" || outfit === "labcoat" ? outfitColor : skin;
-  const longSleeve = outfit === "suit" || outfit === "hoodie" || outfit === "labcoat";
+  const sleeve = outfit === "suit" || outfit === "hoodie" || outfit === "labcoat" || outfit === "robe" ? outfitColor : skin;
+  const longSleeve = outfit === "suit" || outfit === "hoodie" || outfit === "labcoat" || outfit === "robe";
   const bodyOpacity = ghost ? 0.93 : undefined;
   const glow = ghost ? skin : undefined;
 
@@ -53,6 +53,7 @@ export function Character({ agent, motion }: Props) {
   const root = useRef<Group>(null);
   const gemMat = useRef<MeshStandardMaterial>(null);
   const smileMesh = useRef<Mesh>(null), mouthMesh = useRef<Mesh>(null);
+  const skirt = useRef<Group>(null);
   const P = useMemo(() => makePose(), []);
   const fingerL = useMemo<FingerState>(() => ({ grip: 0.3, wiggle: 0 }), []);
   const fingerR = useMemo<FingerState>(() => ({ grip: 0.3, wiggle: 0 }), []);
@@ -100,6 +101,13 @@ export function Character({ agent, motion }: Props) {
     // skeleton
     const hips = J.hips.current;
     if (hips) hips.position.y += (P.hipsY - hips.position.y) * k;
+    // A robe hangs from the hip joint. Shorten and narrow it while seated, so the hem stays off the floor
+    // and the flare does not swallow the chair.
+    if (skirt.current) {
+      const hang = clamp((P.hipsY - 0.12) / 0.88, 0.4, 1), width = 0.78 + 0.22 * hang;
+      skirt.current.scale.set(width, hang, width);
+      skirt.current.rotation.z = Math.sin(motion.walkPhase) * 0.04;
+    }
     rot("spine", P.spineX, P.spineY, P.spineZ); rot("chest", P.chestX, 0, P.chestZ);
     rot("head", P.headX, P.headY, P.headZ);
     rot("shL", P.shLX, 0, P.shLZ); rot("shR", P.shRX, 0, P.shRZ);
@@ -113,7 +121,7 @@ export function Character({ agent, motion }: Props) {
     fingerL.grip += (P.gripL - fingerL.grip) * k; fingerR.grip += (P.gripR - fingerR.grip) * k;
     fingerL.wiggle = P.wiggle; fingerR.wiggle = P.wiggle;
     if (J.cue.current) J.cue.current.visible = P.prop === "cue";
-    if (J.wand.current) J.wand.current.visible = P.prop === "wand";
+    if (J.wand.current) J.wand.current.visible = P.prop === "wand" || P.prop === "none";
     if (J.padL.current) J.padL.current.visible = P.prop === "pad";
     if (J.padR.current) J.padR.current.visible = P.prop === "pad";
     if (J.cup.current) J.cup.current.visible = P.prop === "cup";
@@ -171,11 +179,11 @@ export function Character({ agent, motion }: Props) {
       gemMat.current?.color.copy(tint); gemMat.current?.emissive.copy(tint);
     }
     const gem = J.gem.current;
-    if (gem) { gem.rotation.y = t * 1.8; gem.position.y = 2.15 + Math.sin(t * 2.2 + seed) * 0.05 * m; }
+    if (gem) { gem.rotation.y = t * 1.8; gem.position.y = 2.32 + Math.sin(t * 2.2 + seed) * 0.05 * m; }
     if (gemMat.current) gemMat.current.emissiveIntensity = a.status === "error" ? (Math.sin(t * 10) > 0 ? 1.6 : 0.3) : a.status === "thinking" ? 0.6 + 0.4 * Math.sin(t * 6) : 0.9;
 
     void walkingNow;
-    setAnchor(agent.id, motion.x, g.position.y + 2.5, motion.z);
+    setAnchor(agent.id, motion.x, g.position.y + 2.6, motion.z);
   });
 
   const body = (o?: number) => ({ opacity: o, emissive: glow, emissiveIntensity: glow ? 0.28 : undefined });
@@ -215,6 +223,12 @@ export function Character({ agent, motion }: Props) {
     <group ref={root} position={[motion.x, motion.y, motion.z]} onClick={e => { e.stopPropagation(); select(agent.id); }}>
       <group ref={J.body} scale={BODY_SCALE}>
         <group ref={J.hips} position={[0, 0.92, 0]}>
+          {outfit === "robe" && (
+            <group ref={skirt}>
+              <Cylr rt={0.2} rb={0.33} h={0.6} pos={[0, -0.3, 0]} color={outfitColor} />
+              <Cylr rt={0.33} rb={0.335} h={0.05} pos={[0, -0.58, 0]} color={shade(outfitColor, 1.3)} outline={false} />
+            </group>
+          )}
           {/* pelvis, and legs (zombie) or a swaying tail (ghost) */}
           {ghost ? (<>
             <Sph r={0.2} scale={[1, 0.85, 0.95]} color={skin} {...body(bodyOpacity)} />
@@ -327,7 +341,7 @@ export function Character({ agent, motion }: Props) {
                         {!ghost && [-0.02, 0.02].map(x => <mesh key={x} position={[x, -0.012, 0]} rotation={[Math.PI, 0, 0]}><coneGeometry args={[0.008, 0.016, 4]} /><meshBasicMaterial color="#E9E4D0" /></mesh>)}
                       </group>
                     </group>
-                    <Hair style={hairStyle} color={hairColor} />
+                    {accessory !== "wizardhat" && <Hair style={hairStyle} color={hairColor} />}
                     <AccessoryMesh kind={accessory} accent={agent.color} outfit={outfitColor} />
                     <HeadExtras extras={extras} />
                     <group ref={J.sweat} position={[0.27, 0.12, 0.12]} visible={false}>
@@ -347,7 +361,7 @@ export function Character({ agent, motion }: Props) {
         {[-0.1, -0.03, 0.04, 0.11].map(z => <Blk key={z} size={[0.18, 0.004, 0.012]} pos={[0, 0.012, z]} color="#9AA3B8" />)}
       </group>
 
-      <group ref={J.gem} position={[0, 2.15, 0]}>
+      <group ref={J.gem} position={[0, 2.32, 0]}>
         <mesh scale={[1, 1.6, 1]}>
           <octahedronGeometry args={[0.115]} />
           <meshStandardMaterial ref={gemMat} color={STATUS.idle.color} emissive={STATUS.idle.color} emissiveIntensity={0.9} flatShading />
