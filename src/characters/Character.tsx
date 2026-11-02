@@ -10,6 +10,7 @@ import { useOfficeStore } from "../state/officeStore";
 import { stepMotion, type RobotMotion } from "./motion";
 
 const FADE = 0.25;
+const STRIDE_WALK = 1.5, STRIDE_RUN = 3.4;   // ground speed (m/s) at which each clip plays at normal rate
 const CHAR_SCALE = 0.55;   // the pack models are about 3.3 units tall
 const TAG_HEIGHT = 2.1;
 const modelUrl = (model: string) => `/models/characters/${model}.glb`;
@@ -42,14 +43,15 @@ export function Character({ agent, motion }: Props) {
     return () => { sceneState.walkers.delete(agent.id); };
   }, [agent.id, motion]);
 
-  const play = (name: string, once: boolean) => {
-    if (current.current === name) return;
+  const play = (name: string, once: boolean, rate = 1) => {
+    if (current.current === name) { actions[name]?.setEffectiveTimeScale(rate); return; }
     const next: AnimationAction | null | undefined = actions[name];
     if (!next) return;
     const prev = actions[current.current];
     next.reset();
     next.setLoop(once ? LoopOnce : LoopRepeat, once ? 1 : Infinity);
     next.clampWhenFinished = true;
+    next.setEffectiveTimeScale(rate);
     next.fadeIn(FADE).play();
     prev?.fadeOut(FADE);
     current.current = name;
@@ -62,7 +64,9 @@ export function Character({ agent, motion }: Props) {
     const a = useOfficeStore.getState().agents[agent.id];
     const walking = stepMotion(motion, dt, WALK_SPEED * motion.speedMul) || motion.pose === "walking";
 
-    if (walking) play(motion.carry ? "Walk_Carry" : motion.speedMul > 1.3 ? "Run" : "Walk", false);
+    // The clips are authored for a slower stride than the world speed, so scale the playback to keep the feet from sliding.
+    const speed = WALK_SPEED * motion.speedMul;
+    if (walking) play(motion.carry ? "Walk_Carry" : motion.speedMul > 1.3 ? "Run" : "Walk", false, motion.speedMul > 1.3 && !motion.carry ? speed / STRIDE_RUN : speed / STRIDE_WALK);
     else if (motion.pose === "seated") play("SitDown", true);
     else play("Idle", false);
 
