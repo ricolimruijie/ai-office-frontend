@@ -75,7 +75,7 @@ export function Character({ agent, motion }: Props) {
 
   return (
     <group ref={root} position={[motion.x, motion.y, motion.z]} onClick={e => { e.stopPropagation(); select(agent.id); }}>
-      <group ref={holder} scale={CHAR_SCALE} rotation={[0, Math.PI, 0]}><primitive object={body} /></group>
+      <group ref={holder} scale={CHAR_SCALE}><primitive object={body} /></group>
     </group>
   );
 }
