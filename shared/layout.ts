@@ -51,7 +51,7 @@ export interface RoomRect {
 
 export interface DeskSpot { x: number; y: number; z: number; room: number }
 
-export type ActivityKind = "pool" | "tv" | "ps5" | "sim" | "arcade" | "bar" | "duel" | "meeting";
+export type ActivityKind = "pool" | "tv" | "ps5" | "sim" | "arcade" | "bar" | "meeting";
 export interface ActivitySpot {
   kind: ActivityKind;
   x: number; z: number; y: number;
@@ -82,8 +82,6 @@ export interface Layout {
   spots: ActivitySpot[];
   meeting: { room: RoomRect; table: { x: number; z: number; len: number; wid: number }; seats: ActivitySpot[] } | null;
   lounge: RoomRect | null;
-  /** The outdoor duelling courtyard in the forecourt, where idle wizards practise spells. */
-  duel: { x: number; z: number; halfW: number; halfD: number; ringR: number } | null;
   /** Extents of everything built. */
   site: { minX: number; maxX: number; minZ: number; maxZ: number };
   routerPos: { x: number; y: number; z: number };
@@ -179,7 +177,6 @@ export function computeLayout(agents: { division: string }[], divisions: Divisio
   // Lounge activity spots. `via` runs from just inside the doorway, along the lane, to dodge the furniture.
   const spots: ActivitySpot[] = [];
   const hallIdx = rooms.findIndex(r => r.theme === "meeting");
-  const siteMinX = Math.min(...rooms.map(r => r.minX));
   const loungeRoom = rooms.findIndex(r => r.theme === "lounge");
   const L = loungeRoom >= 0 ? rooms[loungeRoom] : null;
   if (L) {
@@ -203,22 +200,6 @@ export function computeLayout(agents: { division: string }[], divisions: Divisio
     // stools in front of the butterbeer bar
     add("bar", u(11.4), -11.0, Math.PI, [at(u(11.4), A)]);
     add("bar", u(12.8), -11.0, Math.PI, [at(u(12.8), A)]);
-  }
-
-  // The duelling courtyard: a raised stone ring in the west forecourt, clear of the fountain and its benches.
-  const duelHalfW = 6.25, duelHalfD = 4.75, duelRingR = 3.7;
-  const duelX = siteMinX + duelHalfW + 1.3, duelZ = COURT_Z + 7.0;
-  const duel = hallIdx >= 0 ? { x: duelX, z: duelZ, halfW: duelHalfW, halfD: duelHalfD, ringR: duelRingR } : null;
-  if (duel) {
-    const lane: Pt[] = [{ x: duelX, z: COURT_Z, y: 0 }, { x: duelX, z: duelZ - 4.0, y: 0 }];
-    const pair = (ax: number, az: number, bx: number, bz: number) => {
-      const aIdx = spots.length, bIdx = aIdx + 1;
-      const mkSpot = (x: number, z: number, heading: number, partner: number): ActivitySpot =>
-        ({ kind: "duel", x, z, y: 0, heading, room: hallIdx, via: [...lane, { x, z: duelZ - 4.0, y: 0 }], partner });
-      spots.push(mkSpot(ax, az, Math.PI / 2, bIdx), mkSpot(bx, bz, -Math.PI / 2, aIdx));
-    };
-    pair(duelX - 2.5, duelZ - 1.0, duelX + 2.5, duelZ - 1.0);
-    pair(duelX - 2.5, duelZ + 1.2, duelX + 2.5, duelZ + 1.2);
   }
 
   // The Great Hall: one long table, with everybody seated around it (the first agent at the middle of the back row).
@@ -249,7 +230,7 @@ export function computeLayout(agents: { division: string }[], divisions: Divisio
   };
   const bounds = { minX: site.minX - 6, maxX: site.maxX + 6, minZ: site.minZ - 4, maxZ: site.maxZ + 14 };
   return {
-    desks, rooms, stairs, passages, spots, meeting, lounge: L, duel, site, routerPos, bounds,
+    desks, rooms, stairs, passages, spots, meeting, lounge: L, site, routerPos, bounds,
     center: { x: (bounds.minX + bounds.maxX) / 2, z: (bounds.minZ + bounds.maxZ) / 2 }
   };
 }

@@ -217,15 +217,6 @@ export function RoomsDecor({ layout }: { layout: Layout }) {
         </group>
       ))}
 
-      {/* the forecourt: a fountain, stone benches and potted plants */}
-      <group position={[hx, 0, COURT_Z + 4.4]}>
-        <Cyl rt={2.2} rb={2.4} h={0.5} pos={[0, 0.25, 0]} color={C.stoneLight} seg={20} />
-        <Cyl rt={1.9} rb={1.9} h={0.08} pos={[0, 0.5, 0]} color="#5CA8D8" seg={20} cast={false} />
-        <Cyl rt={0.25} rb={0.4} h={1.6} pos={[0, 1.0, 0]} color={C.stone} seg={10} />
-        <Cyl rt={0.8} rb={0.5} h={0.18} pos={[0, 1.7, 0]} color={C.stoneLight} seg={14} />
-        <Cyl rt={0.1} rb={0.12} h={0.6} pos={[0, 2.0, 0]} color={C.stone} seg={8} />
-        {[0, 1, 2, 3].map(i => <Box key={i} size={[1.8, 0.1, 0.5]} pos={[Math.sin(i * HALF_PI) * 4.0, 0.45, Math.cos(i * HALF_PI) * 4.0]} rot={[0, i * HALF_PI, 0]} color={C.stoneLight} />)}
-      </group>
       {layout.passages.map((x, i) => <PottedPlant key={x} pos={[x, 0, COURT_Z - 0.6]} scale={1.1} seed={i + 12} />)}
 
     </group>
