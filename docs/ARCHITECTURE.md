@@ -88,13 +88,13 @@ The look is cel-shaded: every material is a `MeshToonMaterial` with a 3-step gra
 | Great Hall table and chairs | `decor/Rooms.tsx` (`GreatHallDecor`) |
 | Roofs for the outside view | `Roofs.tsx` |
 | Characters: skeleton, face, hands, hair, outfits | `characters/Character.tsx`, `CharacterParts.tsx` |
-| Poses and emotions per status and activity | `characters/pose.ts` |
+| Animation clip per pose and status | `characters/Character.tsx` |
 | Fading of ceiling and foreground structure | `NearFade.tsx` |
 | Camera (orbit, W A S D, follow) | `CameraRig.tsx` |
 
 **Time of day.** `timeOfDay.ts` blends between hand-tuned moments (night, dawn, morning, noon, afternoon, golden hour, dusk) for sky, sun, sky light, and how much the windows and lamps glow. The sun crosses from east to west between 6:00 and 19:00. Shared materials for windows and lamps (`materials.ts`) are updated once per frame, so every window lights up together.
 
-**Characters.** `Character.tsx` builds one skeleton from groups (joints). Each frame `computePose()` returns the target angle for every joint and every face control from the character's status, pose and activity, and the joints ease toward it. A `robe` adds a skirt group under the hips whose height and width follow the hip height, so it clears the floor while seated; a `wizardhat` sits on the skull and the hair is skipped. Ghost and zombie differ only in body parts and a few pose tweaks (ghosts float, have a tail and fly when they travel, zombies walk with arms out). `Hand` animates five fingers with two joints each.
+**Characters.** `Character.tsx` loads a rigged GLB from `public/models/characters/` and plays one animation clip (SitDown, Walk, Walk_Carry, Run, Idle) chosen from the character's pose and status, cross-fading between them.
 
 **Cost.** The whole scene is roughly 4,000 draw calls, a third of them in the shadow pass, so small props do not cast shadows. Outlines and fingers are switched off when the camera is far, ceiling pieces fade, and the shadow map is smaller on phones.
 
@@ -119,7 +119,7 @@ Set `VITE_EVENT_URL` to point at another server, or implement `OfficeSource` (`s
 | Add a division or change a room's theme | `divisions.json`, then `decor/Rooms.tsx` for new furniture |
 | Change how a character looks | `agents.json` (`look`), `characters/CharacterParts.tsx` for new hair, outfits or accessories |
 | Change a character's desk | `agents.json` (`desk`), `desk/Desk.tsx` |
-| Change how a character moves or emotes | `characters/pose.ts` |
+| Change how a character moves or which clip plays | `characters/Character.tsx` |
 | Add or change a lounge activity | `shared/layout.ts` (spots), `decor/Lounge.tsx`, `characters/pose.ts` |
 | Change the floor plan, doors or routes | `shared/layout.ts`, then `Building.tsx` and `Roofs.tsx` |
 | Change the staircase | `shared/layout.ts` (`climb`), `StairTower.tsx` (look) |

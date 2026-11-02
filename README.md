@@ -75,18 +75,16 @@ Each agent is a character with a personal name and a position. Edit `agents.json
 
 | Name | Position | Character | Division | Desk |
 | --- | --- | --- | --- | --- |
-| Nika | Product Manager | Ghost wizard in a navy robe, pointed hat, bow tie and monocle | Headmaster's Tower (upper floor) | Executive: L-shaped walnut desk, three curved monitors, gold RGB |
-| Nova | R&D | Zombie wizard in a plum robe and pointed hat, with stitches | Potions Dungeon | Lab: white bench, dual monitors, test tubes, violet RGB |
-| Lyra | Technical Writer | Ghost wizard in a rust robe and pointed hat, with a hair bun | The Library | Writer: oak desk, curved ultrawide, lamp, books, soft pink RGB |
-| Atlas | Backend | Zombie wizard in a deep green robe and pointed hat, with an exposed bone | Charms Classroom | Backend: two vertical monitors and an ultrawide, two PCs, green RGB |
-| Pixel | Frontend | Ghost wizard in a wine robe and pointed hat | Charms Classroom | Frontend: three monitors, drawing tablet, figurines, pink and cyan RGB |
-| Sentry | QA | Zombie wizard in a bronze robe and pointed hat, with a bandage | Charms Classroom | QA: 2x2 monitor wall, phones under test, signal tower, red and white RGB |
+| Nika | Product Manager | Suit_Female | Headmaster's Tower (upper floor) | Executive |
+| Nova | R&D | Doctor_Female_Young | Potions Dungeon | Lab |
+| Lyra | Technical Writer | Casual2_Female | The Library | Writer |
+| Atlas | Backend | Casual_Male | Charms Classroom | Backend |
+| Pixel | Frontend | Casual3_Female | Charms Classroom | Frontend |
+| Sentry | QA | Worker_Male | Charms Classroom | QA |
 
-Fields: `id`, `name`, `position`, `role`, `color`, `tasks`, `division`, `desk` (`executive`, `lab`, `writer`, `backend`, `frontend`, `qa`) and `look`.
+Fields: `id`, `name`, `position`, `role`, `color`, `tasks`, `division`, `desk` (`executive`, `lab`, `writer`, `backend`, `frontend`, `qa`) and `look`. `look.model` is the file name of a character in `public/models/characters/`. To use another character from the Quaternius pack, add it to `scripts/optimize-assets.sh`, run the script and add its name to `CharacterModel` in `shared/agents.ts`.
 
-**Look.** `look.kind` is `ghost` or `zombie`. The rest is optional: `skin` (the sheet of a ghost, the skin of a zombie), `hair` (`none`, `messy`, `patchy`, `slick`, `spiky`, `bun`, `long`), `hairColor`, `outfit` (`suit`, `hoodie`, `labcoat`, `vest`, `scarf`, `robe`, `none`), `outfitColor`, `pants`, `accessory` (`monocle`, `glasses`, `roundglasses`, `headphones`, `goggles`, `cap`, `beanie`, `tophat`, `wizardhat`, `none`) and `extras` (`stitches`, `bandage`, `bone`, `bowtie`, `tie`).
-
-**The characters.** Every character has a full skeleton: pelvis, spine, chest, neck and head, shoulders, elbows, wrists, five-finger hands, and hips, knees and ankles. Ghosts have a swaying tail instead of legs: they float, and when they travel they fly, leaning into the flight with the tail streaming behind and the arms trailing, instead of stepping. Zombies still walk, arms out in front. Every character is a wizard by default: a `robe` is a flared skirt that hangs from the hips and shortens while seated, a `wizardhat` is a bent, three-segment cone that hides the hair, and a wand stays in the right hand unless the pose needs that hand for something else. The face has eyelids that blink, pupils that follow the camera, eyebrows, cheeks and a mouth that curves from smile to frown and opens. Expression follows what the character is doing: calm and curious when idle, a raised brow and a glance up when thinking, narrowed eyes while working, a big grin when done, wide eyes, worried brows and a sweat drop on an error, and laughing fits while playing in the lounge.
+**The characters.** Rigged, animated people from the Quaternius "Ultimate Animated Character Pack" (CC0). The clip follows what the character is doing: seated at the desk, walking (carrying a note while delivering), running when hurrying back to work, and standing in an activity spot.
 
 **Divisions and rooms.** Each agent's `division` matches an id in `divisions.json`. Every division becomes its own stone building, in one of two rows (the `theme` decides which). The front row faces the forecourt: Charms Classroom (`developers`), the Great Hall (`meeting`) and the Potions Tower (`lab`). The back row faces a lane behind them: the Library (`library`), the Common Room (always there) and the Headmaster's Tower (`executive`, a `level: 1` division whose study is on the upper floor, reached by a spiral staircase inside the tower). A division with `"shared": true`, like the Great Hall, exists even with nobody assigned to it. Building sizes, desks and walking routes are generated from this data (`shared/layout.ts`), so moving an agent to another division just works.
 
@@ -117,7 +115,7 @@ src/
   scene/               buildings, arches, doors, roofs, stair tower, camera, sky and lighting, grounds
     desk/              gaming workstations and the shared RGB lighting
     decor/             room furniture, magical props and the common room
-  characters/          rigged ghost and zombie, poses and emotions, walking, lounge behavior
+  characters/          animated characters (GLB), walking, lounge behavior
   ui/                  top bar, agent list, agent panel, name tags, CSS
 scripts/sync-contract.mjs  copies the contract from ../ai-office-backend
 docs/                  architecture and coding standards

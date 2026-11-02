@@ -1,22 +1,10 @@
-export type CharacterKind = "ghost" | "zombie";
-export type HairStyle = "none" | "messy" | "patchy" | "slick" | "spiky" | "bun" | "long";
-export type Outfit = "suit" | "hoodie" | "labcoat" | "vest" | "scarf" | "robe" | "none";
-export type Accessory = "monocle" | "glasses" | "roundglasses" | "headphones" | "goggles" | "cap" | "beanie" | "tophat" | "wizardhat" | "none";
-export type Extra = "stitches" | "bandage" | "bone" | "bowtie" | "tie";
+/* Which character from the Quaternius pack to use. Files live in public/models/characters/<model>.glb (see scripts/optimize-assets.sh). */
+export type CharacterModel = "Suit_Female" | "Doctor_Female_Young" | "Casual2_Female" | "Casual_Male" | "Casual3_Female" | "Worker_Male";
 export type DeskStyle = "executive" | "lab" | "writer" | "backend" | "frontend" | "qa";
 
-/* How a character looks in the 3D office. Only `kind` is required. */
+/* How a character looks in the 3D home. */
 export interface Look {
-  kind: CharacterKind;
-  /** Body color: the sheet of a ghost, the skin of a zombie. */
-  skin?: string;
-  hair?: HairStyle;
-  hairColor?: string;
-  outfit?: Outfit;
-  outfitColor?: string;
-  pants?: string;
-  accessory?: Accessory;
-  extras?: Extra[];
+  model: CharacterModel;
 }
 
 export interface AgentConfig {
@@ -37,7 +25,7 @@ export interface AgentConfig {
   desk: DeskStyle;
 }
 
-/* A division gets its own room. Level 0 is the ground floor, level 1 is the upper floor (reached by the stairs). */
+/* A division gets its own room. Level 0 is the ground floor, level 1 is the upper floor (reached by the staircase). */
 export interface DivisionConfig {
   id: string;
   name: string;

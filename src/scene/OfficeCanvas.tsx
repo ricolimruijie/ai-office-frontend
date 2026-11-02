@@ -1,7 +1,8 @@
 import { Canvas } from "@react-three/fiber";
 import { useMemo } from "react";
 import { chairPos, computeLayout } from "../../shared/layout";
-import { Character } from "../characters/Character";
+import { Suspense } from "react";
+import { Character, preloadCharacters } from "../characters/Character";
 import { Familiars } from "../characters/Familiars";
 import { LoungeBehavior } from "../characters/LoungeBehavior";
 import { createMotion } from "../characters/motion";
@@ -26,6 +27,8 @@ import { SelectionRing } from "./SelectionRing";
 import { Sky } from "./Sky";
 import { TagProjector } from "./TagProjector";
 
+preloadCharacters(AGENTS);
+
 export function OfficeCanvas() {
   const layout = useMemo(() => computeLayout(AGENTS, DIVISIONS), []);
   const motions = useMemo(() => layout.desks.map(d => { const c = chairPos(d); return createMotion(c.x, c.z, c.y); }), [layout]);
@@ -46,7 +49,7 @@ export function OfficeCanvas() {
         <Roofs layout={layout} />
         <RgbTicker />
         {AGENTS.map((a, i) => <Desk key={a.id} x={layout.desks[i].x} y={layout.desks[i].y} z={layout.desks[i].z} agentId={a.id} style={a.desk} />)}
-        {AGENTS.map((a, i) => <Character key={a.id} agent={a} motion={motions[i]} />)}
+        <Suspense fallback={null}>{AGENTS.map((a, i) => <Character key={a.id} agent={a} motion={motions[i]} />)}</Suspense>
         <ModelRouter layout={layout} />
         <SelectionRing />
         <Pulses layout={layout} />

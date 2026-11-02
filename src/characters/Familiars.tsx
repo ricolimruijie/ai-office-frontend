@@ -4,11 +4,15 @@ import { Vector3, type Group, type Mesh } from "three";
 import { DELIVER_S, SUMMON_S, familiarEnds, familiarFlight, type Layout } from "../../shared/layout";
 import { onSceneEvent } from "../state/ingest";
 import { useOfficeStore } from "../state/officeStore";
-import { shade } from "./CharacterParts";
 import type { RobotMotion } from "./motion";
 import { Blk, Cylr, Sph } from "./parts3d";
 
 const SPARKS = 18;
+function shade(hex: string, f: number) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (v: number) => Math.min(255, Math.round(v * f)).toString(16).padStart(2, "0");
+  return "#" + ch((n >> 16) & 255) + ch((n >> 8) & 255) + ch(n & 255);
+}
 const GOLD = "#FFE680";
 const smooth = (u: number) => u * u * (3 - 2 * u);
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));

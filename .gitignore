@@ -4,3 +4,7 @@ dist
 .env
 *.tsbuildinfo
 .DS_Store
+
+# Raw asset packs (compressed copies live in public/models, see scripts/optimize-assets.sh)
+ModernJapaneseHomePropsLite/
+Ultimate Animated Character Pack - Nov 2019/
