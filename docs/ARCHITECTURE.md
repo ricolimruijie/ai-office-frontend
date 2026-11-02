@@ -77,10 +77,10 @@ The look is cel-shaded: every material is a `MeshToonMaterial` with a 3-step gra
 | Walls that drop when seen from outside | `Cutaway.tsx` |
 | Oak gates that swing open | `Doors.tsx` |
 | The spiral staircase in the Headmaster's Tower | `StairTower.tsx` |
-| Grounds: lawns, lake and bridge, forest, hut, Quidditch pitch, mountains | `Environment.tsx` |
+| Grounds: lawn and a belt of bushes and trees round the castle | `Environment.tsx` |
 | Sun, moon, sky dome, stars, clouds | `timeOfDay.ts`, `Sky.tsx`, `Lighting.tsx` |
 | Gaming workstations (six styles) and RGB lighting | `desk/Desk.tsx`, `desk/gear.tsx`, `desk/rgb.ts` |
-| Room furniture, forecourt fountain, headmaster's study | `decor/Rooms.tsx`, `decor/props.tsx`, `decor/magic.tsx` |
+| Room furniture, headmaster's study | `decor/Rooms.tsx`, `decor/props.tsx`, `decor/magic.tsx` |
 | Common room | `decor/Lounge.tsx` |
 | Great Hall table and chairs | `decor/Rooms.tsx` (`GreatHallDecor`) |
 | Roofs for the outside view | `Roofs.tsx` |
